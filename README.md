@@ -3,7 +3,6 @@
 ##Tugas besar
 
 
-
 1. player akan ditanya apakah ingin main berdua atau sendiri.
 
 2. jika sendiri maka pemain akan memasukkan username.
@@ -18,3 +17,5 @@
   3.1 player akan memilih permainan.
   3.2 setelah terlihat siapa yang menang maka nilai sementara akan terlihat.
   3.3 player akan memilih ingin mengulangi permainan atau tidak jika mengulang skor akan terus bertambah jika tidak skor akan terkalibrasi ulang dan skor sebelumnya akan masuk       ke riwayat permainan yang akan berisi tanggal dan jam permainan.
+# Tugas-Alprog
+tempat untuk mengumpulkan tugas matakuliah algoritma pemrograman
