@@ -1,6 +1,11 @@
+
+
 ##Tugas besar
 
+
+
 1. player akan ditanya apakah ingin main berdua atau sendiri.
+
 2. jika sendiri maka pemain akan memasukkan username.
 
   2.1.  pemain akan memilih permain yang akan dimainkan.
