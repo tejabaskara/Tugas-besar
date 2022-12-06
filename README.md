@@ -2,6 +2,7 @@
 ## Tugas-Alprog
 tempat untuk mengumpulkan tugas besar matakuliah algoritma pemrograman
 
+<<<<<<< HEAD
 jalan program yang ingin dilakukan
 1. player akan ditanya apakah ingin main berdua atau sendiri.
 2. jika sendiri maka pemain akan memasukkan username.
@@ -25,3 +26,13 @@ jalan program yang ingin dilakukan
 4. tetris
     a. peogram belum ada
     b. riwayat highscore
+=======
+# manajemen supermarket
+1. memberikan stok barang.
+2. harga barang pada stock.
+3. jenis barang
+4. harga member
+5. discount
+6. tanggal
+7. struk pembayaran
+>>>>>>> a3d57df76f3bf03e81889cd55f68cfab717bb0c7
