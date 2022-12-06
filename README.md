@@ -11,3 +11,6 @@ tempat untuk mengumpulkan tugas besar matakuliah algoritma pemrograman
 6. tanggal
 7. struk pembayaran
 
+# Algoritma
+1. Masukkan username dan juga pass
+2. nomer pembelian 
