@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
+FILE *riwayat;
+
 struct boardScore
 {
     char nama[10];
@@ -57,9 +60,16 @@ int main()
     int player;
     int w;
 
+
+    printf("Masukkan nama Player 1: ");
+    fgets(player1.nama, sizeof(player1.nama), stdin);
+    printf("Masukkan nama Player 2: ");
+    fgets(player2.nama, sizeof(player2.nama), stdin);
+    system("cls||clear");
+
     while (jawaban == 'Y')
     {
-        printf("player 1 ");
+        printf("%s", player1.nama);
         printf("GAME GUNTING BATU KERTAS\n");
         printf("1. gunting\n");
         printf("2. batu\n");
@@ -67,7 +77,7 @@ int main()
         printf("==> ");
         scanf("%d", &pilihan1);
         system("cls||clear");
-        printf("player 2");
+        printf("%s", player2.nama);
         printf("GAME GUNTING BATU KERTAS\n");
         printf("1. gunting\n");
         printf("2. batu\n");
@@ -94,14 +104,24 @@ int main()
         system("cls||clear");
     }
 
-    printf("player 1\n");
+    
+    printf("Nama: %s", player1.nama);
     printf("score :%d\n", player1.score);
-    printf("alamat data :%p\n", &player1.score);
-    printf("Player 2\n");
-    printf("score: %d\n", player2.score);
-    printf("alamat data :%p\n", &player2.score);
+    // printf("alamat data :%p\n", &player1.score);
+    printf("Nama :%s", player2.nama);
+    printf("Score: %d\n", player2.score);
+    // printf("alamat data :%p\n", &player2.score);
     printf("banyak main: %d\n", player1.banyakMain);
-    printf("alamat data :%p\n", &player1.banyakMain);
+    // printf("alamat data :%p\n", &player1.banyakMain);
+    riwayat = fopen("a.txt", "a");
+    fprintf(riwayat, "\n%s%d\n%s%d", player1.nama, player1.score, player2.nama, player2.score);
+    if ((riwayat = fopen("a.txt", "r")) == NULL)
+    {
+        printf("error");
+        exit(1);
+    }
+    fclose(riwayat);
+    
 
     return 0;
 }

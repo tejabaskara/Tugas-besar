@@ -13,3 +13,15 @@ jalan program yang ingin dilakukan
 8.  setelah terlihat siapa yang menang maka nilai sementara akan terlihat.
 9.  player akan memilih ingin mengulangi permainan atau tidak jika mengulang skor akan terus bertambah jika tidak skor akan terkalibrasi ulang dan skor sebelumnya akan masuk       ke riwayat permainan yang akan berisi tanggal dan jam permainan.
 10.  pertanyaan ingin mengulangi lagi atau tidak.
+
+# must fixed
+1. program suit
+    a. tambahkan program untuk membaca riwayat
+2. tic tac toe
+    a. tambahkan program untuk memasukkan riwayat dan membaca riwayat
+3. snake xenia
+    a. program belum ada
+    b. riwayat highscore 
+4. tetris
+    a. peogram belum ada
+    b. riwayat highscore

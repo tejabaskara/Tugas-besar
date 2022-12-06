@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <conio.h>
 
 FILE *file;
 char square[10] = {'o', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
@@ -49,7 +50,7 @@ int main()
         {
             printf("Invalid option !");
             player--;
-            getchar();
+            getch();
         }
         i = checkWin();
         player++;
@@ -117,10 +118,10 @@ int checkWin()
 
 void drawBoard()
 {
+    system("cls || clear");
     printf("SKOR SEMENTARA\n");
     printf("Player 1: %d", score1);
     printf("\tPlayer 2: %d", score2);
-    system("cls || clear");
     printf("\n\n\t Tic Tac Toe \n\n");
     printf("Player1 (X) - Player2 (O) \n\n\n");
     printf("     |     |     \n");
