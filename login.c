@@ -2,24 +2,34 @@
 #include <stdlib.h>
 #include <string.h>
 
-FILE *fptr; //file pointer sebagai alat yang digunakan untuk membuka dan mengubah database yang berupa file text
+FILE *fptr; // file pointer sebagai alat yang digunakan untuk membuka dan mengubah database yang berupa file text
 
-struct pengenal //untuk membuat variabel menjadi lebih mudah untuk dimengerti
+struct pengenal// untuk membuat variabel menjadi lebih mudah untuk dimengerti
 {
-    char username[20];
+    char username[80];
     char password[8];
 };
 
+int cekRegis(char username[20]){
+    fptr = fopen("database_user.txt", "r");
+    
+    char temp[80];
+    int i;
 
-int login(){
+    while ( fgets(temp, sizeof(temp), fptr)!= NULL)
+    {
+        if ((i % 2) == 0 && strcmp(temp, username) == 0)
+        {
+            return 1;
+        }
+        i++;
+    }
+    fclose(fptr);
 
+    return 0;
 }
 
-int registrasi(){
-
-}
-
-int adminCheck(char password[8]) //untuk mengecek password admin
+int adminCheck(char password[8]) // untuk mengecek password admin
 {
     char adminPassword[8] = {"admin12"};
     int hasil;
@@ -38,10 +48,9 @@ int adminCheck(char password[8]) //untuk mengecek password admin
     }
 }
 
-int check(char nama[20], char password[8])// untuk mengecek username dan password 
+int check(char nama[20], char password[8]) // untuk mengecek username dan password
 {
     char temp[255];
-    char const *temp1;
     int i = 1, a = 0;
 
     fptr = fopen("database_user.txt", "r");
@@ -50,33 +59,89 @@ int check(char nama[20], char password[8])// untuk mengecek username dan passwor
         a = -1;
     }
 
-    while ((temp1 = fgets(temp, sizeof(temp), fptr)) != NULL)
+    while ( (fgets(temp, sizeof(temp), fptr)) != NULL)
     {
-        if ((i % 2) == 1 && strcmp(temp1, nama) == 0)
+
+        if ((i % 2) == 1 && strcmp(temp, nama) == 0)
         {
             a++;
         }
-        else if ((i % 2) == 0 && strcmp(temp1, password) == 0)
+        else if ((i % 2) == 0 && strcmp(temp, password) == 10)
         {
             a += 2;
         }
-        else
-        {
-            printf("username not found");
-        }
         i++;
+        fflush(stdin);
     }
     fclose(fptr);
     return a;
 }
 
+void registrasi()
+{
+    struct pengenal admin;
+    struct pengenal registrasiPegawai;
+    fflush(stdin);
+
+    printf("Masukkan password ADMIN: ");
+    fgets(admin.password, sizeof(admin.password), stdin);
+    int hasil = adminCheck(admin.password);
+    system("clear||cls");
+    fptr = fopen("database_user.txt", "a");
+    if (hasil == 1)
+    {
+        printf("Password yang anda masukkan benar\n");
+        printf("Masukkan username: ");
+        getchar();
+        scanf("%[^\n]s", registrasiPegawai.username);
+        printf("Masukkan password anda: ");
+        getchar();
+        scanf("%[^\n]s", registrasiPegawai.password);
+        fprintf(fptr, "%s\n", registrasiPegawai.username);
+        fprintf(fptr, "%s\n", registrasiPegawai.password);
+        fclose(fptr);
+    }
+    else if (hasil == -1)
+    {
+        printf("Password yang anda masukkan salah\n");
+    }
+}
+
+void login()
+{
+    struct pengenal login;
+
+    printf("Masukkan username: ");
+    fgets(login.username, sizeof(login.username), stdin);
+    printf("Masukkan password anda: ");
+    fgets(login.password, sizeof(login.password), stdin);
+
+    int hasilPengecekan = check(login.username, login.password);
+
+    if (hasilPengecekan == 2)
+    {
+        printf("Login berhasil");
+    }
+    else if (hasilPengecekan == 1)
+    {
+        printf("Password anda salah");
+    }
+    else if (hasilPengecekan == 0 || hasilPengecekan == 2)
+    {
+        printf("Username anda salah");
+    }
+    else if (hasilPengecekan == -1)
+    {
+        printf("Anda belum membuat username dan password");
+    }
+    fflush(stdin);
+}
+
 int main()
 {
-    struct pengenal masuk; //nama  struct untuk username dan password yang akan dimasukkan
-    struct pengenal admin; //nama struct untuk admin
-    struct pengenal cek; //nama struct untuk mengecek password
-
     int pilihan; // variabel untuk memilih nilai untuk pilihan yang dilakukan
+
+    fflush(stdin);
 
     printf("Selamat datang di Minimarket\n");
     printf("1. login\n");
@@ -88,73 +153,17 @@ int main()
     getchar();
     switch (pilihan)
     {
-    case 1:
-        printf("Masukkan username: ");
-        fgets(masuk.username, sizeof(masuk.username), stdin);
-        printf("Masukkan password anda: ");
-        fgets(masuk.password, sizeof(masuk.password), stdin);
-        int hasilPengecekan = check(masuk.username, masuk.password);
-        if (hasilPengecekan == 3)
-        {
-            printf("Login berhasil");
-        }
-        else if (hasilPengecekan == 1)
-        {
-            printf("Password anda salah");
-        }
-        else if (hasilPengecekan == 0 || hasilPengecekan == 2)
-        {
-            printf("Username anda salah");
-        }
-        else if (hasilPengecekan == -1)
-        {
-            printf("Anda belum membuat username dan password");
-        }
+    case 1: // untuk login
+        login();
         break;
-    case 2:
-        printf("Masukkan password ADMIN: ");
-        fgets(admin.password, sizeof(admin.password), stdin);
-        int hasil = adminCheck(admin.password);
-        system("clear||cls");
-        fptr = fopen("database_user.txt", "a");
-        if (hasil == 1)
-        {
-            getchar();
-            printf("Password yang anda masukkan benar\n");
-            printf("Masukkan username: ");
-            fgets(masuk.username, sizeof(masuk.username), stdin);
-            printf("Masukkan password anda: ");
-            fgets(masuk.password, sizeof(masuk.password), stdin);
-            // printf("Konfirmasi password anda: ");
-            // fgets(cek.password, sizeof(cek.password), stdin);
-            
-            // hasil
-            // while (strcmp(cek.password, masuk.password) == 0)
-            // {
-            //     printf("Konfirmasi password anda: ");
-            //    fgets(cek.password, sizeof(cek.password), stdin);
-            // }
-            // if (strcmp(cek.password, masuk.password) == 0)
-            // {
-            //     fprintf(fptr, "%s", masuk.username);
-            //     fprintf(fptr, "%s", masuk.password);
-            // }
-            // else if (strcmp(cek.password, masuk.password) == 0)
-            // {
-            //     printf("Konfirmasi password anda salah");
-            //     printf("Silahkan ulangi lagi");
-            // }
-            fprintf(fptr, "%s", masuk.username);
-            fprintf(fptr, "%s", masuk.password);
-        }
-        else if (hasil == -1)
-        {
-            printf("Password yang anda masukkan salah\n");
-        }
+    case 2: // untuk melakukan registrasi
+        registrasi();
+        main();
         break;
-    case 3:
+    case 9:
         exit(1);
     }
+    fflush(stdin);
 
     printf("Terimakasih sudah mencoba");
 
