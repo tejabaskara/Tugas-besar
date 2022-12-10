@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 FILE *fptr;
 
@@ -9,31 +10,45 @@ struct barang
     int stok;
 };
 
-
-void checkBarang(){
-
-    struct barang list;
-    int i = 0;
-    char temp1 [20];
-    char temp [20];
-
-    fptr = fopen("Barang.txt", "r");
-    while ((temp1 = fgets(temp, sizeof(temp), fptr)) != NULL)
+int checkBuff(char buff[20])
+{
+    // char buffer[100];
+    size_t len = strlen(buff);
+    if (len > 0 && buff[len - 1] == '\n')
     {
-        if ((i % 2) == 1)
-        {
-            list.namaBarang = temp1;
-        }
-        else if ((i % 2) == 0)
-        {
-            a += 2;
-        }
-        i++;
+        buff[--len] = '\0';
     }
 }
 
+void checkBarang()
+{
 
+    struct barang list;
+    int i = 0;
+    char temp[20];
 
-int main(){
+    printf("==========================================\n");
+    printf("NAMA \t\t||STOK\n");
+    printf("==========================================\n");
+    fptr = fopen("Barang.txt", "r");
+    while ((fgets(temp, sizeof(temp), fptr)) != NULL)
+    {
+        checkBuff(temp);
+        if ((i % 2) == 0)
+        {
+            printf("%s\t\t||", temp);
+        }
+        else if ((i % 2) == 1)
+        {
+            printf("%s\n", temp);
+        }
+        i++;
+    }
+    fclose(fptr);
+}
 
+int main()
+{
+    checkBarang();
+    return 0;
 }
