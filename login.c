@@ -10,7 +10,7 @@ struct pengenal// untuk membuat variabel menjadi lebih mudah untuk dimengerti
     char password[8];
 };
 
-int cekRegis(char username[20]){
+int cekRegis(char username[20]){ // Mengecek registrasi 
     fptr = fopen("database_user.txt", "r");
     
     char temp[80];
@@ -56,7 +56,7 @@ int check(char nama[20], char password[8]) // untuk mengecek username dan passwo
     fptr = fopen("database_user.txt", "r");
     if (fptr == NULL)
     {
-        a = -1;
+        return -1;
     }
 
     while ( (fgets(temp, sizeof(temp), fptr)) != NULL)
@@ -66,7 +66,7 @@ int check(char nama[20], char password[8]) // untuk mengecek username dan passwo
         {
             a++;
         }
-        else if ((i % 2) == 0 && strcmp(temp, password) == 10)
+        else if ((i % 2) == 0 && strcmp(temp, password) == 0)
         {
             a += 2;
         }
@@ -77,7 +77,7 @@ int check(char nama[20], char password[8]) // untuk mengecek username dan passwo
     return a;
 }
 
-void registrasi()
+void registrasi() // untuk melakukan
 {
     struct pengenal admin;
     struct pengenal registrasiPegawai;
@@ -90,7 +90,9 @@ void registrasi()
     fptr = fopen("database_user.txt", "a");
     if (hasil == 1)
     {
-        printf("Password yang anda masukkan benar\n");
+        printf("===================================================\n");
+        printf("\tPassword ADMIN yang anda masukkan benar\n");
+        printf("===================================================\n\n");
         printf("Masukkan username: ");
         getchar();
         scanf("%[^\n]s", registrasiPegawai.username);
@@ -103,7 +105,9 @@ void registrasi()
     }
     else if (hasil == -1)
     {
-        printf("Password yang anda masukkan salah\n");
+        printf("===================================================\n");
+        printf("\tPassword yang anda masukkan salah\n");
+        printf("===================================================\n");
     }
 }
 
@@ -111,6 +115,7 @@ void login()
 {
     struct pengenal login;
 
+    printf("===================================================\n");
     printf("Masukkan username: ");
     fgets(login.username, sizeof(login.username), stdin);
     printf("Masukkan password anda: ");
@@ -120,19 +125,27 @@ void login()
 
     if (hasilPengecekan == 2)
     {
-        printf("Login berhasil");
+        printf("===================================================\n");
+        printf("\tLogin berhasil\n");
+        printf("===================================================\n");
     }
     else if (hasilPengecekan == 1)
     {
-        printf("Password anda salah");
+        printf("===================================================\n");
+        printf("\tPassword anda salah\n");
+        printf("===================================================\n");
     }
     else if (hasilPengecekan == 0 || hasilPengecekan == 2)
     {
-        printf("Username anda salah");
+        printf("===================================================\n");
+        printf("\tUsername anda salah\n");
+        printf("===================================================\n");
     }
     else if (hasilPengecekan == -1)
     {
-        printf("Anda belum membuat username dan password");
+        printf("===================================================\n");
+        printf("\tAnda belum membuat username dan password\n");
+        printf("===================================================\n");
     }
     fflush(stdin);
 }
@@ -143,10 +156,11 @@ int main()
 
     fflush(stdin);
 
-    printf("Selamat datang di Minimarket\n");
+    printf("====================================\n");
     printf("1. login\n");
     printf("2. Register\n");
     printf("9. exit\n");
+    printf("==>");
     scanf("%d", &pilihan);
 
     system("clear||cls");
