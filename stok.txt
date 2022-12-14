@@ -1,0 +1,5 @@
+Roti : 		43
+Susu : 		28
+Beras 1kg : 	12
+Sabun Tangan : 	10
+Fanta: 		17
