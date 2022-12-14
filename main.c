@@ -4,7 +4,6 @@
 #include <windows.h>
 #include <ctype.h>
 
-
 /*
 =======================================================================================||
     TEMPAT UNTUK MENARUH STRUCT (MULAI)
@@ -24,14 +23,22 @@ struct pengenal // untuk membuat variabel menjadi lebih mudah untuk dimengerti
 =======================================================================================||
 */
 
+/*
+=======================================================================================||
+    TEMPAT UNTUK VARIABEL GLOBAL (MULAI)
+*/
 char adminPassword[] = {"admin123"};
 char adminUsername[] = {"admin"};
+char huruf_ulang[1];
+/*
+    TEMPAT UNTUK VARIABEL GLOBAL (SELESAI)
+=======================================================================================||
+*/
 
 /*
 =======================================================================================||
     TEMPAT UNTUK MENARUH SEMUA FUNGSI DAN PROSEDUR YANG ADA (MULAI)
 */
-char huruf_ulang[1];
 void search();
 void quit();
 void registrasi();                               // untuk registrasi pegawai
@@ -54,6 +61,7 @@ void scanUsername(char *username) // Validasi dan input username
     int salah = 1;
     while (salah > 0)
     {
+        salah = 1;
         scanf("%[^\n]", username);
         fflush(stdin);
 
@@ -81,10 +89,13 @@ void scanPassword(char *password) // Validasi dan input password
     int salah = 1;
     while (salah > 0)
     {
+        salah = 1;
         scanf("%[^\n]", password);
         fflush(stdin);
+        getchar();
 
-        if (strlen(password) < 8 || strlen(password) > 8) salah++;
+        if (strlen(password) > 8 || strlen(password) < 8)
+            salah++;
 
         if (salah > 1)
         {
@@ -101,9 +112,9 @@ int cekUsernameRegis(char *username)
 {
     char tempUsername[100];
     char tempPassword[100];
-    int hasil;
+    int hasil = 0;
 
-    FILE *databaseUser = fopen("database.txt", "r");
+    FILE *databaseUser = fopen("akun.txt", "r");
 
     do
     {
@@ -112,11 +123,7 @@ int cekUsernameRegis(char *username)
         {
             if (strcmp(username, tempUsername) == 0)
             {
-                hasil = 1;
-            }
-            else
-            {
-                hasil = 0;
+                hasil++;
             }
         }
     } while (!feof(databaseUser));
@@ -130,16 +137,15 @@ int cekUsernameRegis(char *username)
 =======================================================================================||
 */
 
-
-
 /*
 =======================================================================================||
     KODE LOGIN MULAI
 */
 int checkLogin(char nama[20], char password[8]) // untuk mengecek username dan password (UDAH FIX SIH HARUSNYA)
 {
-    char temp[255];
-    int i = 1, a = 0;
+    char tempUsername[100];
+    char tempPassword[100];
+    int cek = 0;
 
     if (strcmp(adminUsername, nama) == 0)
     {
@@ -155,27 +161,38 @@ int checkLogin(char nama[20], char password[8]) // untuk mengecek username dan p
     }
     else
     {
-        FILE *fptr = fopen("database.txt", "r");
+        FILE *logincek = fopen("akun.txt", "r");
 
-        while ((fgets(temp, sizeof(temp), fptr)) != NULL)
+        do
         {
-            if ((i % 2) == 1 && strcmp(temp, nama) == 0)
+            int read = fscanf(logincek, "%99[^,],%99[^\n]\n", tempUsername, tempPassword);
+            if (read == 2)
             {
-                a++;
+                if (strcmp(nama, tempUsername) == 0)
+                {
+                    cek ++;
+                    if (strcmp(password, tempPassword) == 0)
+                    {
+                        cek ++; // Username dan password sesuai
+                    }
+                    else
+                    {
+                        cek = 0; // Username dan password tidak sesuai
+                    }
+                }
+                else
+                {
+                    cek = -1; // Username tidak ada
+                }
             }
-            else if ((i % 2) == 0 && strcmp(temp, password) == 0)
-            {
-                a += 2;
-            }
-            i++;
-            fflush(stdin);
-        }
-        fclose(fptr);
-        return a;
+        } while (!feof(logincek));
+        fclose(logincek);
+
+        return cek;
     }
 }
 
-void registrasi() // untuk melakukan
+void registrasi() // untuk melakukan registrasi (UDAH FIX SIH HARUSNYA)
 {
     struct pengenal admin;
     struct pengenal registrasiPegawai;
@@ -196,6 +213,19 @@ void registrasi() // untuk melakukan
         printf("Masukkan password anda: ");
         getchar();
         scanPassword(registrasiPegawai.password);
+
+        int cek = cekUsernameRegis(registrasiPegawai.username);
+        printf("%d", cek);
+        while (cek == 1)
+        {
+            printf("USERNAME ANDA SUDAH TERDAFTAR\n\n");
+            printf("Masukkan username: ");
+            getchar();
+            scanUsername(registrasiPegawai.username);
+            printf("Masukkan password anda: ");
+            getchar();
+            scanPassword(registrasiPegawai.password);
+        }
         fprintf(regisAkun, "%s,%s\n", registrasiPegawai.username, registrasiPegawai.password);
         fclose(regisAkun);
     }
@@ -215,10 +245,12 @@ void login()
     printf("Masukkan username: ");
     scanUsername(login.username);
     printf("Masukkan password anda: ");
+    getchar();
     scanPassword(login.password);
 
     int hasilPengecekan = checkLogin(login.username, login.password);
 
+    printf("%d", hasilPengecekan);
     if (hasilPengecekan == 2)
     {
         printf("===================================================\n");
@@ -233,19 +265,12 @@ void login()
         printf("\tPassword anda salah\n");
         printf("===================================================\n");
     }
-    else if (hasilPengecekan == 0 || hasilPengecekan == 2)
+    else if (hasilPengecekan == 0)
     {
         printf("===================================================\n");
-        printf("\tUsername anda salah\n");
+        printf("\tUsername tidak berhasil ditemukan\n");
         printf("===================================================\n");
     }
-    else if (hasilPengecekan == -1)
-    {
-        printf("===================================================\n");
-        printf("\tAnda belum membuat username dan password\n");
-        printf("===================================================\n");
-    }
-    fflush(stdin);
 }
 
 int LoginMenu()
@@ -254,7 +279,7 @@ int LoginMenu()
 
     fflush(stdin);
 
-    FILE *fptr = fopen("database_user.txt", "r");
+    FILE *fptr = fopen("akun.txt", "r");
     if (fptr == NULL)
     {
         printf("=======================================================================================\n");
@@ -298,8 +323,6 @@ int LoginMenu()
     KODE LOGIN SELESAI
 =======================================================================================||
 */
-
-
 
 /*
 =======================================================================================||
