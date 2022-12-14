@@ -3,14 +3,10 @@
 tempat untuk mengumpulkan tugas besar matakuliah algoritma pemrograman
 
 # manajemen supermarket
-1. memberikan stok barang.
-2. harga barang pada stock.
-3. jenis barang
-4. harga member
-5. discount
-6. tanggal
-7. struk pembayaran
-
-# Algoritma
-1. Masukkan username dan juga pass
-2. nomer pembelian 
+1. struk pembayaran
+2. Masukkan username dan juga pass
+3. database barang
+4. database username dan password
+5. database member
+6. harga member
+7. 
