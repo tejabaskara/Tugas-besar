@@ -2,17 +2,309 @@
 #include <string.h>
 #include <stdlib.h>
 #include <windows.h>
+#include <ctype.h>
 
+
+/*
+=======================================================================================||
+    TEMPAT UNTUK MENARUH STRUCT (MULAI)
+*/
 struct Mahasiswa
 {
     char nama[20];
     int nilai;
 };
+struct pengenal // untuk membuat variabel menjadi lebih mudah untuk dimengerti
+{
+    char username[80];
+    char password[8];
+};
+/*
+    TEMPAT UNTUK MENARUH STRUCT (SELESAI)
+=======================================================================================||
+*/
 
+char adminPassword[] = {"admin123"};
+char adminUsername[] = {"admin"};
+
+/*
+=======================================================================================||
+    TEMPAT UNTUK MENARUH SEMUA FUNGSI DAN PROSEDUR YANG ADA (MULAI)
+*/
 char huruf_ulang[1];
 void search();
 void quit();
+void registrasi();                               // untuk registrasi pegawai
+void login();                                    // untuk login pegawai dan admin
+int cekSuperPassword(char password[8]);          // untuk mengecek admin
+int checkLogin(char nama[20], char password[8]); // untuk mengecek login yang dilakukan
+int LoginMenu();                                 // menu dari login page
+int menuKasir();
+/*
+    TEMPAT UNTUK MENARUH SEMUA FUNGSI DAN PROSEDUR YANG ADA (SELESAI)
+=======================================================================================||
+*/
 
+/*
+=======================================================================================||
+    TEMPAT VALIDASI MULAI
+*/
+void scanUsername(char *username) // Validasi dan input username
+{
+    int salah = 1;
+    while (salah > 0)
+    {
+        scanf("%[^\n]", username);
+        fflush(stdin);
+
+        if (strlen(username) < 4 || strlen(username) > 16)
+            salah++;
+        for (int i = 0; i < strlen(username); i++)
+        {
+            if (!isdigit(username[i]) && !islower(username[i]) && !isupper(username[i]))
+                salah++;
+        }
+
+        if (salah > 1)
+        {
+            printf("Format username yang anda masukkan salah\n> ");
+        }
+        else
+        {
+            break;
+        }
+    }
+}
+
+void scanPassword(char *password) // Validasi dan input password
+{
+    int salah = 1;
+    while (salah > 0)
+    {
+        scanf("%[^\n]", password);
+        fflush(stdin);
+
+        if (strlen(password) < 8 || strlen(password) > 8) salah++;
+
+        if (salah > 1)
+        {
+            printf("Masukkan password 8 digit !\n:");
+        }
+        else
+        {
+            break;
+        }
+    }
+}
+
+int cekUsernameRegis(char *username)
+{
+    char tempUsername[100];
+    char tempPassword[100];
+    int hasil;
+
+    FILE *databaseUser = fopen("database.txt", "r");
+
+    do
+    {
+        int baca = fscanf(databaseUser, "%99[^,],%99[^\n]\n", tempUsername, tempPassword);
+        if (baca == 2)
+        {
+            if (strcmp(username, tempUsername) == 0)
+            {
+                hasil = 1;
+            }
+            else
+            {
+                hasil = 0;
+            }
+        }
+    } while (!feof(databaseUser));
+    fclose(databaseUser);
+
+    return hasil;
+}
+
+/*
+    TEMPAT VALIDASI SELESAI
+=======================================================================================||
+*/
+
+
+
+/*
+=======================================================================================||
+    KODE LOGIN MULAI
+*/
+int checkLogin(char nama[20], char password[8]) // untuk mengecek username dan password (UDAH FIX SIH HARUSNYA)
+{
+    char temp[255];
+    int i = 1, a = 0;
+
+    if (strcmp(adminUsername, nama) == 0)
+    {
+        if (strcmp(adminPassword, password) == 0)
+        {
+            // menuAdmin();
+            printf("anda admin");
+        }
+        else
+        {
+            printf("password anda salah");
+        }
+    }
+    else
+    {
+        FILE *fptr = fopen("database.txt", "r");
+
+        while ((fgets(temp, sizeof(temp), fptr)) != NULL)
+        {
+            if ((i % 2) == 1 && strcmp(temp, nama) == 0)
+            {
+                a++;
+            }
+            else if ((i % 2) == 0 && strcmp(temp, password) == 0)
+            {
+                a += 2;
+            }
+            i++;
+            fflush(stdin);
+        }
+        fclose(fptr);
+        return a;
+    }
+}
+
+void registrasi() // untuk melakukan
+{
+    struct pengenal admin;
+    struct pengenal registrasiPegawai;
+
+    printf("Masukkan password ADMIN: ");
+    scanPassword(admin.password);
+    int hasil = strcmp(admin.password, adminPassword);
+    system("clear||cls");
+    FILE *regisAkun = fopen("akun.txt", "a+");
+    if (hasil == 0)
+    {
+        printf("===================================================\n");
+        printf("\tPassword ADMIN yang anda masukkan benar\n");
+        printf("===================================================\n\n");
+        printf("Masukkan username: ");
+        getchar();
+        scanUsername(registrasiPegawai.username);
+        printf("Masukkan password anda: ");
+        getchar();
+        scanPassword(registrasiPegawai.password);
+        fprintf(regisAkun, "%s,%s\n", registrasiPegawai.username, registrasiPegawai.password);
+        fclose(regisAkun);
+    }
+    else
+    {
+        printf("===================================================\n");
+        printf("\tPassword yang anda masukkan salah\n");
+        printf("===================================================\n");
+    }
+}
+
+void login()
+{
+    struct pengenal login;
+
+    printf("===================================================\n");
+    printf("Masukkan username: ");
+    scanUsername(login.username);
+    printf("Masukkan password anda: ");
+    scanPassword(login.password);
+
+    int hasilPengecekan = checkLogin(login.username, login.password);
+
+    if (hasilPengecekan == 2)
+    {
+        printf("===================================================\n");
+        printf("\tLogin berhasil\n");
+        printf("===================================================\n");
+        system("pause");
+        menuKasir();
+    }
+    else if (hasilPengecekan == 1)
+    {
+        printf("===================================================\n");
+        printf("\tPassword anda salah\n");
+        printf("===================================================\n");
+    }
+    else if (hasilPengecekan == 0 || hasilPengecekan == 2)
+    {
+        printf("===================================================\n");
+        printf("\tUsername anda salah\n");
+        printf("===================================================\n");
+    }
+    else if (hasilPengecekan == -1)
+    {
+        printf("===================================================\n");
+        printf("\tAnda belum membuat username dan password\n");
+        printf("===================================================\n");
+    }
+    fflush(stdin);
+}
+
+int LoginMenu()
+{
+    int pilihan; // variabel untuk memilih nilai untuk pilihan yang dilakukan
+
+    fflush(stdin);
+
+    FILE *fptr = fopen("database_user.txt", "r");
+    if (fptr == NULL)
+    {
+        printf("=======================================================================================\n");
+        printf("Anda belum memiliki data untuk melakukan registrasi\n");
+        printf("=======================================================================================\n");
+        printf("Tekan enter untuk melanjutkan ");
+        getchar();
+        system("clear||cls");
+        registrasi();
+    }
+
+    printf("=============================================\n");
+    printf("SILAHKAN UNTUK MELAKUKAN LOGIN DAN REGISTRASI\n");
+    printf("=============================================\n");
+    printf("1. login\n");
+    printf("2. Register\n");
+    printf("9. exit\n");
+    printf("==>");
+    scanf("%d", &pilihan);
+
+    system("clear||cls");
+    getchar();
+    switch (pilihan)
+    {
+    case 1: // untuk login
+        login();
+        break;
+    case 2: // untuk melakukan registrasi
+        registrasi();
+        LoginMenu();
+        break;
+    case 9:
+        exit(1);
+    }
+    fflush(stdin);
+
+    printf("Terimakasih sudah mencoba");
+    return 0;
+}
+/*
+    KODE LOGIN SELESAI
+=======================================================================================||
+*/
+
+
+
+/*
+=======================================================================================||
+    KODE APA ???
+*/
 void sort()
 {
     char str[255];
@@ -143,7 +435,7 @@ void quit()
     printf("Program Berakhir");
 }
 
-void main()
+int menuKasir()
 {
     int pilihan, karakter;
 
@@ -190,3 +482,20 @@ void main()
     }
     return 0;
 }
+/*
+    KODE APA ???
+=======================================================================================||
+*/
+
+/*
+    MAIN MULAI
+=======================================================================================||
+*/
+int main()
+{
+    LoginMenu();
+}
+/*
+    MAIN SELESAI
+=======================================================================================||
+*/

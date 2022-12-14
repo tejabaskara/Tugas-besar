@@ -1,6 +1,0 @@
-barang
-1
-rinso
-123
-sabun
-1235
