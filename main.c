@@ -41,8 +41,8 @@ char huruf_ulang[1];
 */
 void search();
 void quit();
-void registrasi();                               // untuk registrasi pegawai
-void login();                                    // untuk login pegawai dan admin
+void registrasi(); // untuk registrasi pegawai
+void login();      // untuk login pegawai dan admin
 void scanUsername(char *username);
 void scanPassword(char *password);
 int cekUsernameRegis(char *username);
@@ -61,23 +61,22 @@ int menuKasir();
 */
 void scanUsername(char *username) // Validasi dan input username
 {
-    int salah = 1;
-    while (salah > 0)
+    int salah;
+    while (1)
     {
-        salah = 1;
+        salah = 0;
         scanf(" %[^\n]", username);
-        // printf("%s", username);
         fflush(stdin);
 
         if (strlen(username) < 4 || strlen(username) > 16)
-            salah++;
+            salah ++;
         for (int i = 0; i < strlen(username); i++)
         {
             if (!isdigit(username[i]) && !islower(username[i]) && !isupper(username[i]))
-                salah++;
+                salah ++;
         }
 
-        if (salah > 1)
+        if (salah > 0)
         {
             printf("Format username yang anda masukkan salah\n> ");
         }
@@ -90,25 +89,17 @@ void scanUsername(char *username) // Validasi dan input username
 
 void scanPassword(char *password) // Validasi dan input password
 {
-    int salah = 1;
-    while (salah > 0)
+    int salah;
+    while (1)
     {
-        salah = 1;
         scanf("%[^\n]", password);
         fflush(stdin);
         getchar();
 
         if (strlen(password) > 8 || strlen(password) < 8)
-            salah++;
-
-        if (salah > 1)
-        {
             printf("Masukkan password 8 digit !\n:");
-        }
         else
-        {
             break;
-        }
     }
 }
 
@@ -141,9 +132,9 @@ int validInt(int *var)
     char buff[1020];
     char cek;
     fflush(stdin);
-    if (fgets(buff, sizeof(buff), stdin) != NULL)
+    if (fgets(buff, sizeof(buff), stdin) != NULL) // mengecek apakah pada input yang dimasukkan terdapat string jika tidak input akan lanjut
     {
-        if (sscanf(buff, "%d %c", var, &cek) == 1)
+        if (sscanf(buff, "%d %c", var, &cek) == 1) // mengecek ulang apakah input benar tidak ada character
         {
             return 1;
         }
@@ -168,7 +159,7 @@ void inputInt(int *var, char *prompt)
 
 /*
 =======================================================================================||
-    KODE LOGIN MULAI
+    KODE LOGIN DAN REGISTRASI MULAI
 */
 int checkLogin(char nama[20], char password[8]) // untuk mengecek username dan password (UDAH FIX SIH HARUSNYA)
 {
@@ -352,10 +343,54 @@ int LoginMenu()
     return 0;
 }
 /*
-    KODE LOGIN SELESAI
+    KODE LOGIN DAN REGISTRASI SELESAI
 =======================================================================================||
 */
 
+/*
+=======================================================================================||
+    MENU ADMIN
+*/
+void menuAdmin()
+{
+    int pilihan;
+    printf("\n+--------------------------------+\n");
+    printf("|           MENU ADMIN           |\n");
+    printf("|================================|\n");
+    printf("| [1] Cek Stok Barang            |\n");
+    printf("| [2] Cek Database Akun          |\n");
+    printf("| [3] Cek Discount               |\n");
+    printf("| [4] Cek Member                 |\n");
+    printf("| [0] EXIT                       |\n");
+    printf("|                                |\n");
+    printf("+--------------------------------+\n");
+    inputInt(&pilihan, "==>");
+
+    switch (pilihan)
+    {
+    case 1:
+        // cekStok();
+        printf("Under Maintenence");
+        break;
+    case 2:
+        // cekAkun();
+        printf("Under Maintenence");
+        break;
+    case 3:
+        // cekDiscount();
+        printf("Under Maintenence");
+        break;
+    case 4:
+        // cekMember();
+        printf("Under Maintenence");
+        break;
+    }
+}
+
+/*
+    MENU ADMIN
+=======================================================================================||
+*/
 
 /*
 =======================================================================================||
