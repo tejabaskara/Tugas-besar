@@ -1,5 +1,6 @@
-Roti : 		43
-Susu : 		28
-Beras 1kg : 	12
-Sabun Tangan : 	10
-Fanta: 		17
+rinso,40,2000
+freshtea,30,7000
+esterC,1000,1000
+mochi,30,2000
+es teh,200,1000
+tissue,90,9000
