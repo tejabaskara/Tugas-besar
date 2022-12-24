@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <windows.h>
 #include <ctype.h>
 
 /*
@@ -17,6 +16,12 @@ struct pengenal // untuk membuat variabel menjadi lebih mudah untuk dimengerti
 {
     char username[80];
     char password[8];
+};
+struct barang // untuk membuat variabel barang
+{
+    char namaBarang[100];
+    int stokBarang;
+    int hargaBarang;
 };
 /*
     TEMPAT UNTUK MENARUH STRUCT (SELESAI)
@@ -43,9 +48,16 @@ void search();
 void quit();
 void registrasi(); // untuk registrasi pegawai
 void login();      // untuk login pegawai dan admin
-void scanUsername(char *username);
-void scanPassword(char *password);
-int cekUsernameRegis(char *username);
+void scanUsername(char *username); //untuk mengambil data username
+void scanPassword(char *password); // untuk mengambil data password
+void CekBarang(struct barang list[]); //untuk mengecek barang yang ada di database
+void ubahStok(struct barang ubah[]); // untuk mengubah database stok barang
+void ubahHarga(struct barang list[]); // untuk mengubah database harga barang
+void tambahBarang(struct barang list[]); // untuk menambahkan barang
+void menuAdmin(); //menu yang dikhususkan untuk admin
+int main(); //tempat berjalannya program utama
+int cekStok(); // tempat menu untuk mengecek stok dan mengubahnya
+int cekUsernameRegis(char *username); //untuk mengecek username saat registrasi atau login
 int cekSuperPassword(char password[8]);          // untuk mengecek admin
 int checkLogin(char nama[20], char password[8]); // untuk mengecek login yang dilakukan
 int LoginMenu();                                 // menu dari login page
@@ -69,11 +81,11 @@ void scanUsername(char *username) // Validasi dan input username
         fflush(stdin);
 
         if (strlen(username) < 4 || strlen(username) > 16)
-            salah ++;
+            salah++;
         for (int i = 0; i < strlen(username); i++)
         {
             if (!isdigit(username[i]) && !islower(username[i]) && !isupper(username[i]))
-                salah ++;
+                salah++;
         }
 
         if (salah > 0)
@@ -171,8 +183,7 @@ int checkLogin(char nama[20], char password[8]) // untuk mengecek username dan p
     {
         if (strcmp(adminPassword, password) == 0)
         {
-            // menuAdmin();
-            printf("anda admin");
+            menuAdmin();
         }
         else
         {
@@ -272,14 +283,14 @@ void login() // belum mau fix masih dalam proses
     printf("===================================================\n");
     printf("Masukkan username: ");
     scanUsername(login.username);
-    printf("%s", login.username);
+    // printf("%s", login.username);
     printf("Masukkan password anda: ");
     getchar();
     scanPassword(login.password);
 
     int hasilPengecekan = checkLogin(login.username, login.password);
 
-    printf("%d", hasilPengecekan);
+    // printf("%d", hasilPengecekan);
     if (hasilPengecekan == 2)
     {
         printf("===================================================\n");
@@ -351,9 +362,251 @@ int LoginMenu()
 =======================================================================================||
     MENU ADMIN
 */
+void CekBarang(struct barang list[1000])
+{
+    FILE *stok = fopen("stok.txt", "r");
+    char tempNamaBarang[100], tempStokBarang[100], tempHargaBarang[100], namabarang[100];
+    int i = 0, pilihan, banyakbarang;
+    printf("+----------------------------------------------+\n");
+    printf("|                   Cek Stok                   |\n");
+    printf("|==============================================|\n");
+    printf("Nama Barang\t||Stok Barang\t||Harga Barang||\n");
+    do
+    {
+        int baca = fscanf(stok, "%99[^,],%99[^,],%99[^\n]\n", tempNamaBarang, tempStokBarang, tempHargaBarang);
+        if (baca == 3)
+        {
+            strcpy(list[i].namaBarang, tempNamaBarang);
+            list[i].stokBarang = atoi(tempStokBarang);
+            list[i].hargaBarang = atoi(tempHargaBarang);
+        }
+        printf("%d. %s\t||", i + 1, list[i].namaBarang);
+        printf("%d\t\t||", list[i].stokBarang);
+        printf("Rp.%d\n", list[i].hargaBarang);
+        i++;
+    } while (!feof(stok));
+    fclose(stok);
+}
+
+void ubahStok(struct barang ubah[1000])
+{
+    char namabarang[100];
+    int banyakBarang, i = 0;
+    printf("\n\n           Mengubah Stok        \n");
+    printf("Masukkan nama barang: ");
+    scanf("%[^\n]", namabarang);
+    fflush(stdin);
+    getchar();
+    inputInt(&banyakBarang, "Banyak stok:");
+    fflush(stdin);
+    system("clear||cls");
+    for (i = 0; i < 1000; i++)
+    {
+        int hasil = strcmp(ubah[i].namaBarang, "\0");
+        int hasilBarang = strcmp(ubah[i].namaBarang, namabarang);
+        if (hasil == 0)
+        {
+            break;
+        }
+        else
+        {
+            if (hasilBarang == 0)
+            {
+                if (i == 0)
+                {
+                    ubah[i].stokBarang = banyakBarang;
+                    FILE *ganti = fopen("stok.txt", "w");
+                    fprintf(ganti, "%s,%d,%d\n", ubah[i].namaBarang, ubah[i].stokBarang, ubah[i].hargaBarang);
+                    fclose(ganti);
+                }
+                else
+                {
+                    ubah[i].stokBarang = banyakBarang;
+                    FILE *ganti = fopen("stok.txt", "a");
+                    fprintf(ganti, "%s,%d,%d\n", ubah[i].namaBarang, ubah[i].stokBarang, ubah[i].hargaBarang);
+                    fclose(ganti);
+                }
+            }
+            else
+            {
+                if (i == 0)
+                {
+                    FILE *ganti = fopen("stok.txt", "w");
+                    fprintf(ganti, "%s,%d,%d\n", ubah[i].namaBarang, ubah[i].stokBarang, ubah[i].hargaBarang);
+                    fclose(ganti);
+                }
+                else
+                {
+                    FILE *ganti = fopen("stok.txt", "a");
+                    fprintf(ganti, "%s,%d,%d\n", ubah[i].namaBarang, ubah[i].stokBarang, ubah[i].hargaBarang);
+                    fclose(ganti);
+                }
+            }
+        }
+    }
+    cekStok();
+}
+
+void ubahHarga(struct barang list[1000])
+{
+    char namabarang[100];
+    int hargaBarang, i = 0;
+    printf("\n\n          Mengubah Harga       \n");
+    printf("Masukkan nama barang: ");
+    scanf("%[^\n]", namabarang);
+    fflush(stdin);
+    getchar();
+    inputInt(&hargaBarang, "Harga barang:");
+    fflush(stdin);
+    system("clear||cls");
+    for (i = 0; i < 1000; i++)
+    {
+        int hasil = strcmp(list[i].namaBarang, "\0");
+        int hasilBarang = strcmp(list[i].namaBarang, namabarang);
+        if (hasil == 0)
+        {
+            break;
+        }
+        else
+        {
+            if (hasilBarang == 0)
+            {
+                if (i == 0)
+                {
+                    list[i].hargaBarang = hargaBarang;
+                    FILE *ganti = fopen("stok.txt", "a");
+                    fprintf(ganti, "%s,%d,%d\n", list[i].namaBarang, list[i].stokBarang, list[i].hargaBarang);
+                    fclose(ganti);
+                }
+                else
+                {
+                    list[i].hargaBarang = hargaBarang;
+                    FILE *ganti = fopen("stok.txt", "a");
+                    fprintf(ganti, "%s,%d,%d\n", list[i].namaBarang, list[i].stokBarang, list[i].hargaBarang);
+                    fclose(ganti);
+                }
+            }
+            else
+            {
+                if (i == 0)
+                {
+                    FILE *ganti = fopen("stok.txt", "w");
+                    fprintf(ganti, "%s,%d,%d\n", list[i].namaBarang, list[i].stokBarang, list[i].hargaBarang);
+                    fclose(ganti);
+                }
+                else
+                {
+                    FILE *ganti = fopen("stok.txt", "a");
+                    fprintf(ganti, "%s,%d,%d\n", list[i].namaBarang, list[i].stokBarang, list[i].hargaBarang);
+                    fclose(ganti);
+                }
+            }
+        }
+    }
+    cekStok();
+}
+
+void tambahBarang(struct barang list[1000])
+{
+    char namabarang[100];
+    int hargaBarang, banyakBarang, i = 0;
+    printf("\n\n         Menambah Stok         \n");
+    printf("Masukkan nama barang: ");
+    scanf("%[^\n]", namabarang);
+    fflush(stdin);
+    getchar();
+    inputInt(&banyakBarang, "Stok Barang: ");
+    fflush(stdin);
+    inputInt(&hargaBarang, "Harga barang: ");
+    fflush(stdin);
+    system("clear||cls");
+
+    for (i = 0; i < 1000; i++)
+    {
+        int hasil = strcmp(list[i].namaBarang, "\0");
+        int hasilBarang = strcmp(list[i].namaBarang, namabarang);
+        if (hasil == 0)
+        {
+            break;
+        }
+        else
+        {
+            if (hasilBarang == 0)
+            {
+                printf("BARANG SUDAH TERDAPAT PADA NOMOR %d\n", i + 1);
+                cekStok();
+                break;
+            }
+        }
+    }
+
+    for (i = 0; i < 1000; i++)
+    {
+        int hasil = strcmp(list[i].namaBarang, "\0");
+        if (hasil == 0)
+        {
+            strcpy(list[i].namaBarang, namabarang);
+            list[i].stokBarang = banyakBarang;
+            list[i].hargaBarang = hargaBarang;
+            FILE *ganti = fopen("stok.txt", "a");
+            fprintf(ganti, "%s,%d,%d\n", list[i].namaBarang, list[i].stokBarang, list[i].hargaBarang);
+            fclose(ganti);
+            break;
+        }
+        else
+        {
+            if (i == 0)
+            {
+                FILE *ganti = fopen("stok.txt", "w");
+                fprintf(ganti, "%s,%d,%d\n", list[i].namaBarang, list[i].stokBarang, list[i].hargaBarang);
+                fclose(ganti);
+            }
+            else
+            {
+                FILE *ganti = fopen("stok.txt", "a");
+                fprintf(ganti, "%s,%d,%d\n", list[i].namaBarang, list[i].stokBarang, list[i].hargaBarang);
+                fclose(ganti);
+            }
+        }
+    }
+    cekStok();
+}
+
+int cekStok()
+{
+    struct barang cek[1000];
+    char namabarang[100];
+    int i = 0, pilihan, banyakBarang, hargaBarang;
+
+    CekBarang(cek);
+    printf("\n\n[1] Mengubah Stok, [2] Mengubah harga, [3] Menambah barang, [0]EXIT ");
+    inputInt(&pilihan, "=>");
+    system("clear||cls");
+    switch (pilihan)
+    {
+    case 0:
+        main();
+        break;
+    case 1: // untuk mengubah stok barang
+        CekBarang(cek);
+        ubahStok(cek);
+        break;
+    case 2: // untuk mengubah harga barang
+        CekBarang(cek);
+        ubahHarga(cek);
+        break;
+    case 3: // untuk menambahkan barang yang ada pada database stok
+        CekBarang(cek);
+        tambahBarang(cek);
+        break;
+    }
+    return 0;
+}
+
 void menuAdmin()
 {
     int pilihan;
+    system("clear||cls");
     printf("\n+--------------------------------+\n");
     printf("|           MENU ADMIN           |\n");
     printf("|================================|\n");
@@ -365,12 +618,12 @@ void menuAdmin()
     printf("|                                |\n");
     printf("+--------------------------------+\n");
     inputInt(&pilihan, "==>");
+    system("clear||cls");
 
     switch (pilihan)
     {
     case 1:
-        // cekStok();
-        printf("Under Maintenence");
+        cekStok();
         break;
     case 2:
         // cekAkun();
@@ -383,6 +636,9 @@ void menuAdmin()
     case 4:
         // cekMember();
         printf("Under Maintenence");
+        break;
+    case 0:
+        exit(1);
         break;
     }
 }
