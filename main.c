@@ -596,19 +596,22 @@ int cekStok() //untuk menunjukkan isi database stok
     switch (pilihan)
     {
     case 0:
-        main();
+        menuAdmin();
         break;
     case 1: // untuk mengubah stok barang
         CekBarang(cek);
         ubahStok(cek);
+        menuAdmin();
         break;
     case 2: // untuk mengubah harga barang
         CekBarang(cek);
         ubahHarga(cek);
+        menuAdmin();
         break;
     case 3: // untuk menambahkan barang yang ada pada database stok
         CekBarang(cek);
         tambahBarang(cek);
+        menuAdmin();
         break;
     }
     return 0;
