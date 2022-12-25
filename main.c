@@ -23,6 +23,13 @@ struct barang // untuk membuat variabel barang
     int stokBarang;
     int hargaBarang;
 };
+struct member
+{
+    int IDMember;
+    char nama[100];
+    char noKtp[16];
+    char noTelp[12];
+};
 /*
     TEMPAT UNTUK MENARUH STRUCT (SELESAI)
 =======================================================================================||
@@ -46,22 +53,26 @@ char huruf_ulang[1];
 */
 void search();
 void quit();
-void registrasi(); // untuk registrasi pegawai
-void login();      // untuk login pegawai dan admin
-void scanUsername(char *username); //untuk mengambil data username
-void scanPassword(char *password); // untuk mengambil data password
-void CekBarang(struct barang list[]); //untuk mengecek barang yang ada di database
-void ubahStok(struct barang ubah[]); // untuk mengubah database stok barang
-void ubahHarga(struct barang list[]); // untuk mengubah database harga barang
+void registrasi();                       // untuk registrasi pegawai
+void login();                            // untuk login pegawai dan admin
+void scanUsername(char *username);       // untuk mengambil data username
+void scanPassword(char *password);       // untuk mengambil data password
+void CekBarang(struct barang list[]);    // untuk mengecek barang yang ada di database
+void ubahStok(struct barang ubah[]);     // untuk mengubah database stok barang
+void ubahHarga(struct barang list[]);    // untuk mengubah database harga barang
 void tambahBarang(struct barang list[]); // untuk menambahkan barang
-void menuAdmin(); //menu yang dikhususkan untuk admin
-int main(); //tempat berjalannya program utama
-int cekStok(); // tempat menu untuk mengecek stok dan mengubahnya
-int cekUsernameRegis(char *username); //untuk mengecek username saat registrasi atau login
+void menuAdmin();                        // menu yang dikhususkan untuk admin
+void hapusAkun();
+void tampilanAkun(struct pengenal list[]);
+int main();                                      // tempat berjalannya program utama
+int cekStok();                                   // tempat menu untuk mengecek stok dan mengubahnya
+int cekUsernameRegis(char *username);            // untuk mengecek username saat registrasi atau login
 int cekSuperPassword(char password[8]);          // untuk mengecek admin
 int checkLogin(char nama[20], char password[8]); // untuk mengecek login yang dilakukan
 int LoginMenu();                                 // menu dari login page
 int menuKasir();
+int cekAkun();
+void deleteLine(FILE *src, FILE *temp, const int line);
 /*
     TEMPAT UNTUK MENARUH SEMUA FUNGSI DAN PROSEDUR YANG ADA (SELESAI)
 =======================================================================================||
@@ -84,7 +95,7 @@ void scanUsername(char *username) // Validasi dan input username
             salah++;
         for (int i = 0; i < strlen(username); i++)
         {
-            if (!isdigit(username[i]) && !islower(username[i]) && !isupper(username[i]))
+            if (!islower(username[i]) && !isupper(username[i]))
                 salah++;
         }
 
@@ -155,10 +166,12 @@ int validInt(int *var)
 }
 void inputInt(int *var, char *prompt)
 {
+    int hasil;
     while (1)
     {
         printf("%s", prompt);
-        if (validInt(var))
+        hasil = validInt(var);
+        if (hasil == 1)
             break;
         printf("Input hanya  boleh berupa angka!! \n");
         printf("\n");
@@ -173,13 +186,13 @@ void inputInt(int *var, char *prompt)
 =======================================================================================||
     KODE LOGIN DAN REGISTRASI MULAI
 */
-int checkLogin(char nama[20], char password[8]) // untuk mengecek username dan password (UDAH FIX SIH HARUSNYA)
+int checkLogin(char username[20], char password[8]) // UDAH FIX SIH HARUSNYA
 {
     char tempUsername[100];
     char tempPassword[100];
     int cek = 0;
 
-    if (strcmp(adminUsername, nama) == 0)
+    if (strcmp(adminUsername, username) == 0)
     {
         if (strcmp(adminPassword, password) == 0)
         {
@@ -199,12 +212,12 @@ int checkLogin(char nama[20], char password[8]) // untuk mengecek username dan p
             int read = fscanf(logincek, "%99[^,],%99[^\n]\n", tempUsername, tempPassword);
             if (read == 2)
             {
-                printf("%s\n", tempUsername);
-                printf("%s\n", nama);
-                printf("%s\n", tempPassword);
-                printf("%s\n", password);
-                int hasil = strcmp(nama, tempUsername);
-                printf("%d\n", strcmp(nama, tempUsername));
+                // printf("%s\n", tempUsername);
+                // printf("%s\n", username);
+                // printf("%s\n", tempPassword);
+                // printf("%s\n", password);
+                int hasil = strcmp(username, tempUsername);
+                // printf("%d\n", strcmp(password, tempPassword));
                 if (hasil == 0)
                 {
                     if (strcmp(password, tempPassword) == 0)
@@ -215,10 +228,6 @@ int checkLogin(char nama[20], char password[8]) // untuk mengecek username dan p
                     {
                         return 1; // Username dan password tidak sesuai
                     }
-                }
-                else
-                {
-                    return 0; // Username tidak ada
                 }
             }
         } while (!feof(logincek));
@@ -331,9 +340,9 @@ int LoginMenu()
     printf("=============================================\n");
     printf("SILAHKAN UNTUK MELAKUKAN LOGIN DAN REGISTRASI\n");
     printf("=============================================\n");
-    printf("1. login\n");
-    printf("2. Register\n");
-    printf("9. exit\n");
+    printf("[1] login\n");
+    printf("[2]Register\n");
+    printf("[0] exit\n");
     inputInt(&pilihan, "==>");
 
     system("clear||cls");
@@ -346,7 +355,7 @@ int LoginMenu()
         registrasi();
         LoginMenu();
         break;
-    case 9:
+    case 0:
         exit(1);
     }
 
@@ -362,7 +371,9 @@ int LoginMenu()
 =======================================================================================||
     MENU ADMIN
 */
-void CekBarang(struct barang list[1000])
+
+// untuk mengubah database stok barang
+void CekBarang(struct barang list[1000]) //untuk mengecek isi dari database stok
 {
     FILE *stok = fopen("stok.txt", "r");
     char tempNamaBarang[100], tempStokBarang[100], tempHargaBarang[100], namabarang[100];
@@ -388,7 +399,7 @@ void CekBarang(struct barang list[1000])
     fclose(stok);
 }
 
-void ubahStok(struct barang ubah[1000])
+void ubahStok(struct barang ubah[1000]) //untuk mengubah stok barang yang ada pada database stok
 {
     char namabarang[100];
     int banyakBarang, i = 0;
@@ -447,7 +458,7 @@ void ubahStok(struct barang ubah[1000])
     cekStok();
 }
 
-void ubahHarga(struct barang list[1000])
+void ubahHarga(struct barang list[1000])//untuk mengubah harga barang yang ada pada database stok
 {
     char namabarang[100];
     int hargaBarang, i = 0;
@@ -506,7 +517,7 @@ void ubahHarga(struct barang list[1000])
     cekStok();
 }
 
-void tambahBarang(struct barang list[1000])
+void tambahBarang(struct barang list[1000]) //untuk menambahkan barang ke database stok barang
 {
     char namabarang[100];
     int hargaBarang, banyakBarang, i = 0;
@@ -572,7 +583,7 @@ void tambahBarang(struct barang list[1000])
     cekStok();
 }
 
-int cekStok()
+int cekStok() //untuk menunjukkan isi database stok
 {
     struct barang cek[1000];
     char namabarang[100];
@@ -602,7 +613,167 @@ int cekStok()
     }
     return 0;
 }
+// mengubah database stok selesai
 
+void deleteLine(FILE *src, FILE *temp, const int line)
+{
+    char buffer[1020];
+    int count = 1;
+    while ((fgets(buffer, 1020, src)) != NULL) // jika diambil nilai string tidak sama dengan nol maka program akan berjalan
+    {
+        if (line != count)
+            fputs(buffer, temp); // untuk menulis string pada file temp
+        count++;                 // untuk menghitung
+    }
+}
+
+// mengubah database akun mulai
+void hapusAkun()
+{
+    struct pengenal Akun[1000];
+    FILE *src;
+    FILE *temp;
+    int line;
+    printf("Pilih akun yang akan di hapus\n");
+    inputInt(&line, "==>");
+
+    src = fopen("akun.txt", "r");
+    temp = fopen("delete.tmp", "w");
+    if (src == NULL || temp == NULL)
+    {
+        printf("FILE TAK DAPAT DIBUKA");
+    }
+    deleteLine(src, temp, line); // fungsi untuk menghapus baris text
+    fclose(src);
+    fclose(temp);
+    remove("akun.txt");               // menghapus file akun.txt
+    rename("delete.tmp", "akun.txt"); // mengganti nama file
+    cekAkun();
+}
+
+int cekAkun()
+{
+    struct pengenal Akun[1000];
+    int pilihan;
+    tampilanAkun(Akun);
+    printf("[1]Hapus Akun [0]EXIT");
+    inputInt(&pilihan, "=>");
+    system("clear||cls");
+    switch (pilihan)
+    {
+    case 1:
+        tampilanAkun(Akun);
+        hapusAkun();
+        break;
+    case 0:
+        exit(1);
+        break;
+    }
+    return 0;
+}
+
+void tampilanAkun(struct pengenal list[1000])
+{
+    FILE *akun = fopen("akun.txt", "r");
+    char tempUsername[100], tempPassword[100];
+    int i = 0, pilihan;
+    system("clear||cls");
+    printf("+----------------------------------------------+\n");
+    printf("|                   AKUN                       |\n");
+    printf("|==============================================|\n");
+    printf("Username\t||Password\n");
+    do
+    {
+        int baca = fscanf(akun, "%99[^,],%99[^\n]\n", tempUsername, tempPassword);
+        fflush(stdin);
+        if (baca == 2)
+        {
+            strcpy(list[i].username, tempUsername);
+            strcpy(list[i].password, tempPassword);
+        }
+        printf("%d. %s\t||", i + 1, list[i].username);
+        printf("%s\n", list[i].password);
+        i++;
+    } while (!feof(akun));
+    fclose(akun);
+}
+// mengubah database akun selesai
+
+// mengubah database member mulai
+void cekMember(struct member list[1000])
+{
+    FILE *member = fopen("member.txt", "r");
+    char tempNama[100], tempNoKtp[100], tempNoTelp[100], tempID[100];
+    int i = 0, pilihan, banyakbarang;
+    printf("+----------------------------------------------+\n");
+    printf("|                   Cek Member                   |\n");
+    printf("|==============================================|\n");
+    do
+    {
+        int baca = fscanf(member, "%99[^,],%99[^,],%99[^,],%99[^\n]\n", tempID, tempNama, tempNoKtp, tempNoTelp);
+        if (baca == 4)
+        {
+            strcpy(list[i].nama, tempNama);
+            list[i].IDMember = atoi(tempID);
+            strcpy(list[i].noKtp, tempNoKtp);
+            strcpy(list[i].noTelp, tempNoTelp);
+        }
+        printf("[%d]\t||Nama \t\t:%s\n", i + 1, list[i].nama);
+        printf("\t||No. KTP \t:%.16s\n", list[i].noKtp);
+        printf("\t||No. Telp \t:%s\n", list[i].noTelp);
+        printf("\t||ID Member \t:%d\n", list[i].IDMember);
+        printf("|==============================================|\n");
+        i++;
+    } while (!feof(member));
+    fclose(member);
+}
+int UbahMember()
+{
+    struct member cek[1000];
+    int pilihan;
+
+    FILE *src;
+    FILE *temp;
+
+    cekMember(cek);
+    printf("Masukkan pilihan yang akan dihapus: ");
+    inputInt(&pilihan,"");
+    system("clear||cls");
+    src = fopen("member.txt", "r");
+    temp = fopen("delete.tmp", "w");
+    deleteLine(src, temp, pilihan);
+    if (src == NULL || temp == NULL)
+    {
+        printf("FILE TAK DAPAT DIBUKA");
+    }
+    fclose(src);
+    fclose(temp);
+    remove("member.txt");               // menghapus file akun.txt
+    rename("delete.tmp", "member.txt"); // mengganti nama file
+    cekMember(cek);
+}
+int menuUbahMember(){
+    struct member cek[1000];
+    int pilihan;
+
+    cekMember(cek);
+    printf("[1]Hapus Member [0]EXIT");
+    inputInt(&pilihan,"=>");
+    switch (pilihan)
+    {
+    case 1:
+        UbahMember();
+        menuUbahMember();
+        break;
+    case 0:
+        exit(1);
+        break;
+    default:
+        printf("Masukkan angka berupa 1 dan 0\n");
+        break;
+    }
+}
+// mengubah database member selesai
 void menuAdmin()
 {
     int pilihan;
@@ -612,8 +783,7 @@ void menuAdmin()
     printf("|================================|\n");
     printf("| [1] Cek Stok Barang            |\n");
     printf("| [2] Cek Database Akun          |\n");
-    printf("| [3] Cek Discount               |\n");
-    printf("| [4] Cek Member                 |\n");
+    printf("| [3] Cek Member                 |\n");
     printf("| [0] EXIT                       |\n");
     printf("|                                |\n");
     printf("+--------------------------------+\n");
@@ -626,19 +796,13 @@ void menuAdmin()
         cekStok();
         break;
     case 2:
-        // cekAkun();
-        printf("Under Maintenence");
+        cekAkun();
         break;
     case 3:
-        // cekDiscount();
-        printf("Under Maintenence");
-        break;
-    case 4:
-        // cekMember();
-        printf("Under Maintenence");
+        menuUbahMember();
         break;
     case 0:
-        exit(1);
+        menuAdmin();
         break;
     }
 }
