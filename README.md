@@ -1,12 +1,9 @@
 
 ## Tugas-Alprog
 tempat untuk mengumpulkan tugas besar matakuliah algoritma pemrograman
-
-# manajemen supermarket
-1. struk pembayaran
-2. Masukkan username dan juga pass
-3. database barang
-4. database username dan password
-5. database member
-6. harga member
-7. 
+# PROGRAM MINIMARKET
+merupakan program yang bertujuan untuk membantu minimarket untuk mejalankan minimarketnya.
+program ini dapat digunakan setelah di compile.
+# PEMBUAT:
+Anak Agung Arya Harischandra Jaya ( 2205551049 )
+I Gde Teja Baskara ( 2205551065 )
