@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <time.h>
 
 /*
 =======================================================================================||
@@ -41,7 +42,7 @@ struct member
 */
 char adminPassword[] = {"admin123"};
 char adminUsername[] = {"admin"};
-char huruf_ulang[1];
+char NamaKasir[20];
 /*
     TEMPAT UNTUK VARIABEL GLOBAL (SELESAI)
 =======================================================================================||
@@ -70,9 +71,10 @@ int cekUsernameRegis(char *username);            // untuk mengecek username saat
 int cekSuperPassword(char password[8]);          // untuk mengecek admin
 int checkLogin(char nama[20], char password[8]); // untuk mengecek login yang dilakukan
 int LoginMenu();                                 // menu dari login page
-int menuKasir();
+void menuKasir();
 int cekAkun();
 void deleteLine(FILE *src, FILE *temp, const int line);
+void transaksi();
 /*
     TEMPAT UNTUK MENARUH SEMUA FUNGSI DAN PROSEDUR YANG ADA (SELESAI)
 =======================================================================================||
@@ -190,7 +192,7 @@ int checkLogin(char username[20], char password[8]) // UDAH FIX SIH HARUSNYA
 {
     char tempUsername[100];
     char tempPassword[100];
-    int cek = 0;
+    int cek = 0, hasil1;
 
     if (strcmp(adminUsername, username) == 0)
     {
@@ -214,14 +216,19 @@ int checkLogin(char username[20], char password[8]) // UDAH FIX SIH HARUSNYA
             {
                 // printf("%s\n", tempUsername);
                 // printf("%s\n", username);
+                tempPassword[8] = '\0';
                 // printf("%s\n", tempPassword);
                 // printf("%s\n", password);
                 int hasil = strcmp(username, tempUsername);
                 // printf("%d\n", strcmp(password, tempPassword));
                 if (hasil == 0)
                 {
-                    if (strcmp(password, tempPassword) == 0)
+
+                    hasil1 = strcmp(password, tempPassword);
+                    printf("%d", hasil1);
+                    if (hasil1 == 0)
                     {
+                        strcpy(NamaKasir, username);
                         return 2; // Username dan password sesuai
                     }
                     else
@@ -336,12 +343,12 @@ int LoginMenu()
         system("clear||cls");
         registrasi();
     }
-
+    system("clear||cls");
     printf("=============================================\n");
     printf("SILAHKAN UNTUK MELAKUKAN LOGIN DAN REGISTRASI\n");
     printf("=============================================\n");
     printf("[1] login\n");
-    printf("[2]Register\n");
+    printf("[2] Register\n");
     printf("[0] exit\n");
     inputInt(&pilihan, "==>");
 
@@ -373,7 +380,7 @@ int LoginMenu()
 */
 
 // untuk mengubah database stok barang
-void CekBarang(struct barang list[1000]) //untuk mengecek isi dari database stok
+void CekBarang(struct barang list[1000]) // untuk mengecek isi dari database stok
 {
     FILE *stok = fopen("stok.txt", "r");
     char tempNamaBarang[100], tempStokBarang[100], tempHargaBarang[100], namabarang[100];
@@ -399,7 +406,7 @@ void CekBarang(struct barang list[1000]) //untuk mengecek isi dari database stok
     fclose(stok);
 }
 
-void ubahStok(struct barang ubah[1000]) //untuk mengubah stok barang yang ada pada database stok
+void ubahStok(struct barang ubah[1000]) // untuk mengubah stok barang yang ada pada database stok
 {
     char namabarang[100];
     int banyakBarang, i = 0;
@@ -458,7 +465,7 @@ void ubahStok(struct barang ubah[1000]) //untuk mengubah stok barang yang ada pa
     cekStok();
 }
 
-void ubahHarga(struct barang list[1000])//untuk mengubah harga barang yang ada pada database stok
+void ubahHarga(struct barang list[1000]) // untuk mengubah harga barang yang ada pada database stok
 {
     char namabarang[100];
     int hargaBarang, i = 0;
@@ -517,7 +524,7 @@ void ubahHarga(struct barang list[1000])//untuk mengubah harga barang yang ada p
     cekStok();
 }
 
-void tambahBarang(struct barang list[1000]) //untuk menambahkan barang ke database stok barang
+void tambahBarang(struct barang list[1000]) // untuk menambahkan barang ke database stok barang
 {
     char namabarang[100];
     int hargaBarang, banyakBarang, i = 0;
@@ -583,14 +590,36 @@ void tambahBarang(struct barang list[1000]) //untuk menambahkan barang ke databa
     cekStok();
 }
 
-int cekStok() //untuk menunjukkan isi database stok
+void hapusStok()
+{
+    struct barang list[1000];
+    FILE *src;
+    FILE *temp;
+    int line;
+    printf("Pilih barang yang akan di hapus\n");
+    inputInt(&line, "==>");
+
+    src = fopen("stok.txt", "r");
+    temp = fopen("delete.tmp", "w");
+    if (src == NULL || temp == NULL)
+    {
+        printf("FILE TAK DAPAT DIBUKA");
+    }
+    deleteLine(src, temp, line); // fungsi untuk menghapus baris text
+    fclose(src);
+    fclose(temp);
+    remove("stok.txt");               // menghapus file stok.txt
+    rename("delete.tmp", "stok.txt"); // mengganti nama file
+}
+
+int cekStok() // untuk menunjukkan isi database stok
 {
     struct barang cek[1000];
     char namabarang[100];
     int i = 0, pilihan, banyakBarang, hargaBarang;
 
     CekBarang(cek);
-    printf("\n\n[1] Mengubah Stok, [2] Mengubah harga, [3] Menambah barang, [0]EXIT ");
+    printf("\n\n[1] Mengubah Stok, [2] Mengubah harga\n [3] Menambah barang, [4] Hapus barang, [0]EXIT\n");
     inputInt(&pilihan, "=>");
     system("clear||cls");
     switch (pilihan)
@@ -612,6 +641,14 @@ int cekStok() //untuk menunjukkan isi database stok
         CekBarang(cek);
         tambahBarang(cek);
         menuAdmin();
+        break;
+    case 4:
+        CekBarang(cek);
+        hapusStok();
+        menuAdmin();
+        break;
+    default:
+        cekStok();
         break;
     }
     return 0;
@@ -670,6 +707,9 @@ int cekAkun()
         break;
     case 0:
         exit(1);
+        break;
+    default:
+        cekAkun();
         break;
     }
     return 0;
@@ -740,7 +780,7 @@ int UbahMember()
 
     cekMember(cek);
     printf("Masukkan pilihan yang akan dihapus: ");
-    inputInt(&pilihan,"");
+    inputInt(&pilihan, "");
     system("clear||cls");
     src = fopen("member.txt", "r");
     temp = fopen("delete.tmp", "w");
@@ -755,13 +795,14 @@ int UbahMember()
     rename("delete.tmp", "member.txt"); // mengganti nama file
     cekMember(cek);
 }
-int menuUbahMember(){
+int menuUbahMember()
+{
     struct member cek[1000];
     int pilihan;
 
     cekMember(cek);
     printf("[1]Hapus Member [0]EXIT");
-    inputInt(&pilihan,"=>");
+    inputInt(&pilihan, "=>");
     switch (pilihan)
     {
     case 1:
@@ -805,7 +846,7 @@ void menuAdmin()
         menuUbahMember();
         break;
     case 0:
-        menuAdmin();
+        exit(1);
         break;
     }
 }
@@ -814,190 +855,533 @@ void menuAdmin()
     MENU ADMIN
 =======================================================================================||
 */
-
-/*
-=======================================================================================||
-    KODE APA ???
-*/
-void sort()
+void printTransaksi(struct barang list[1000], int pilihan, int banyak, int index)
 {
-    char str[255];
-
-    FILE *fp;
-    fp = fopen("stok.txt", "r");
-    while (fgets(str, 255, fp) != NULL)
+    int harga, cek;
+    pilihan -= 1;
+    // printf("%s", list[pilihan].namaBarang);
+    // printf("%d", banyak);
+    harga = list[pilihan].hargaBarang * banyak;
+    cek = strcmp(list[pilihan].namaBarang, "\0");
+    if (cek == 0)
     {
-        printf("%s", str);
-        fclose(fp);
+        printf("Barang tidak ditemukan\n");
+        transaksi();
     }
-}
 
-void search()
-{
-    int kode, jmlh;
-
-    typedef char *string;
-    string nama[11] = {"a", "[1] Roti", "[2] Susu", "[3] Beras", "[4] Sabun", "[5] Fanta"};
-    string urutan[11] = {"a", "Pertama", "Kedua", "Ketiga", "Keempat", "Kelima"};
-    int jumlah = 0, t, i, n[1000], y, x, kembali, nobeli, nomor[1000], tt[1000], u;
-    int harga[] = {1, 12000, 7000, 30000, 15000, 6000}, d[1000], tot[1000];
-    double total = 0, uang;
-
-awal:
-    system("clear");
-    i = 0, x = 0, y = 0, nobeli = 0, kembali = 0, uang = 0, total = 0;
-    printf("\n Transaksi\n\n");
-    printf("================================================================================");
-    printf("\n No.|     Nama Barang   |  Harga Barang(Rupiah) |\n");
-    printf("----+-------------------+-----------------------+\n");
-    for (i = 1; i < 6; i++)
+    // printf("%d", harga);
+    if (index == 0)
     {
-        printf("%3d |%13s      |      Rp.%5d.00      |\n", i, nama[i], harga[i]);
-    }
-    printf("===============================================================================\n");
-    do
-    {
-        printf("Jumlah Jenis barang yang anda beli  : ");
-        scanf("%d", &x);
-        if (x > 5)
-        {
-            printf("\nInput Salah! Barang hanya dari 1 sampai 5!  \n\tSilahkan Ulangi lagi!\n\n");
-        }
-    } while (x > 5);
-    for (i = 1; i <= x; i++)
-    {
-        do
-        {
-            printf("\nMasukkan Nomor barang %s : ", urutan[i]);
-            scanf("%d", &d[i]);
-            y = d[i];
-            if (y > 5)
-            {
-                printf("Maaf nomor barang hanya sampai 5");
-            }
-        } while (y > 5);
-        printf("Masukkan jumlah barang  : ");
-        scanf("%d", &n[i]);
-        y = d[i];
-        tot[y] = n[i] * harga[y];
-        total = tot[y] + total;
-    }
-    system("clear");
-    printf("\nDaftar Pembelian Anda    :  \n");
-    printf("================================================================================");
-    printf("\n No. |   Nama Barang  |  Harga Barang(Rupiah) | Jumlah Barang |    Subtotal   |\n");
-    printf("-----+----------------+-----------------------+---------------+---------------+\n");
-    for (i = 1; i <= x; i++)
-    {
-        y = d[i];
-        tt[i] = n[i] * harga[y];
-        nobeli = d[i];
-        printf("%3d      %8s           Rp.%2d.00            %4d        Rp. %d.00\t  \n", i, nama[nobeli], harga[nobeli], n[i], tt[i]);
-    }
-    printf("===============================================================================\n");
-    printf("\n");
-    printf("Totalnya yang anda bayar adalah     : Rp. %.2lf\n\n", total);
-    u = 0;
-    do
-    {
-        printf("Masukkan uang anda                  : Rp. ");
-        scanf("%lf", &uang);
-        if (uang < total)
-            if (u == 0)
-            {
-                printf("\a\n\tMaaf uang anda kurang silahkan ulangi proses transaksi\n \t Silahkan masukkan lagi uang anda!\n\n");
-            }
-            else
-            {
-                continue;
-            }
-        u++;
-    } while (uang < total);
-    kembali = uang - total;
-    printf("\nKembalian anda                      : Rp. %d.00", kembali);
-    printf("\n\n                     Terima Kasih Telah Bertransaksi              \n");
-    printf("\n_________________________________________________________________________\n\n");
-
-pilihan_ulang:
-    printf("\n  Ingin Melakukan Transaksi Lagi?");
-    printf("\n  {1} Iya \n");
-    printf("  {2} Tidak \n");
-    printf("\n  Masukkan Pilihan : ");
-    scanf("%s", &huruf_ulang);
-    fflush(stdin);
-
-    if ((strcmp(huruf_ulang, "1") != 0) && (strcmp(huruf_ulang, "2") != 0))
-    {
-        printf("    Input Invalid ! Masukan Input Yang Benar\n");
-        goto pilihan_ulang;
-    }
-    else if ((strcmp(huruf_ulang, "1") == 0))
-    {
-        system("clear");
-        goto awal;
+        FILE *pembelian = fopen("pembelian.txt", "w+");
+        fprintf(pembelian, "%s,%d,%d\n", list[pilihan].namaBarang, banyak, harga);
+        fclose(pembelian);
     }
     else
     {
-        goto end;
+        FILE *pembelian = fopen("pembelian.txt", "a");
+        fprintf(pembelian, "%s,%d,%d\n", list[pilihan].namaBarang, banyak, harga);
+        fclose(pembelian);
     }
-end:
-    printf("Program Berakhir");
 }
 
-void quit()
+void ubahBelanja(struct barang list[1000])
 {
-    printf("Program Berakhir");
+    int barangUbah, banyakBaru;
+    inputInt(&barangUbah, "Pilih barang yang akan diubah : ");
+    inputInt(&banyakBaru, "Masukkan banyak barang : ");
+    barangUbah -= 1;
+    banyakBaru = list[barangUbah].hargaBarang;
 }
 
-int menuKasir()
+void hapusBelanja()
 {
-    int pilihan, karakter;
+    FILE *src;
+    FILE *temp;
+    int line;
+    printf("Pilih barang yang akan di hapus\n");
+    inputInt(&line, "==>");
 
-    system("clear");
-    printf("\n+--------------------------------+\n");
-    printf("|                                |\n");
-    printf("| [1] Cek Stok Barang            |\n");
-    printf("| [2] Melakukan Transaksi        |\n");
-    printf("| [3] Keluar                     |\n");
-    printf("|                                |\n");
-    printf("+--------------------------------+\n");
-
+    src = fopen("pembelian.txt", "r");
+    temp = fopen("delete.tmp", "w");
+    if (src == NULL || temp == NULL)
+    {
+        printf("FILE TAK DAPAT DIBUKA");
+    }
+    deleteLine(src, temp, line); // fungsi untuk menghapus baris text
+    fclose(src);
+    fclose(temp);
+    remove("pembelian.txt");               // menghapus file akun.txt
+    rename("delete.tmp", "pembelian.txt"); // mengganti nama file
+}
+void printBelanja(struct barang list[1000])
+{
+    FILE *belanja = fopen("pembelian.txt", "r");
+    char tempNamaBarang[100], tempBanyakBarang[100], tempHargaBarang[100], namabarang[100];
+    int i = 0, pilihan, banyakbarang;
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    printf("\n\n+----------------------------------------------------+\n");
+    printf("|                     BELANJA                        |\n");
+    printf("|====================================================|\n");
+    printf("|TANGGAL: %d-%02d-%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
+    printf("|Nama Kasir: %s\n", NamaKasir);
+    printf("|====================================================|\n");
+    printf("|Nama Barang\t||Banyak Pembelian\t||Harga Barang||\n");
+    printf("|====================================================|\n");
+    do
+    {
+        int baca = fscanf(belanja, "%99[^,],%99[^,],%99[^\n]\n", tempNamaBarang, tempBanyakBarang, tempHargaBarang);
+        if (baca == 3)
+        {
+            strcpy(list[i].namaBarang, tempNamaBarang);
+            list[i].stokBarang = atoi(tempBanyakBarang);
+            list[i].hargaBarang = atoi(tempHargaBarang);
+        }
+        printf("%d. %s\t||", i + 1, list[i].namaBarang);
+        printf("%d\t\t\t||", list[i].stokBarang);
+        printf("Rp.%d\n", list[i].hargaBarang);
+        i++;
+    } while (!feof(belanja));
+    fclose(belanja);
+}
+void printStruk(struct barang list[1000])
+{
+    FILE *belanja = fopen("struk.txt", "w+");
+    char tempNamaBarang[100], tempBanyakBarang[100], tempHargaBarang[100], namabarang[100];
+    int i = 0, pilihan, banyakbarang, hasil;
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    fprintf(belanja, "\n\n+----------------------------------------------------+\n");
+    fprintf(belanja, "|                     BELANJA                        |\n");
+    fprintf(belanja, "|====================================================|\n");
+    fprintf(belanja, "|TANGGAL: %d-%02d-%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
+    fprintf(belanja, "|Nama Kasir: %s\n", NamaKasir);
+    fprintf(belanja, "|====================================================|\n");
+    fprintf(belanja, "|Nama Barang\t||Banyak Pembelian\t||Harga Barang||\n");
+    fprintf(belanja, "|====================================================|\n");
     while (1)
     {
-        fflush(stdin);
-        printf("\n\nMasukkan pilihan: ");
-        if (scanf("%c%c", &pilihan, &karakter) != 2 || karakter != '\n')
+        hasil = strcmp(list[i].namaBarang, "\0");
+        if (hasil == 0)
         {
-            printf("\nInput Salah! Mohon masukkan angka 1, 2, atau 3!\n");
-            fflush(stdin);
+            break;
+        }
+        fprintf(belanja, "%d. %s\t||", i + 1, list[i].namaBarang);
+        fprintf(belanja, "%d\t\t\t||", list[i].stokBarang);
+        fprintf(belanja, "Rp.%d\n", list[i].hargaBarang);
+        i++;
+    }
+    fclose(belanja);
+}
+void setelahPembayaran(struct barang list[1000], struct barang list1[1000])
+{
+    int i = 0, a = 0, akhir1, akhir2, sama;
+    while (1)
+    {
+        akhir1 = strcmp(list[i].namaBarang, "\0");
+        if (akhir1 == 0)
+        {
+            break;
         }
         else
         {
-            if (pilihan == '1')
+            for (a = 0; a < 1000; a++)
             {
-                sort();
-                break;
+                akhir2 = strcmp(list1[a].namaBarang, "\0");
+                sama = strcmp(list[i].namaBarang, list1[a].namaBarang);
+                if (akhir2 == 0)
+                {
+                    break;
+                }
+                else
+                {
+                    if (sama == 0)
+                    {
+                        list[i].stokBarang = list[i].stokBarang - list1[a].stokBarang;
+                    }
+                }
             }
-            else if (pilihan == '2')
+            if (i == 0)
             {
-                search();
-                break;
-            }
-            else if (pilihan == '3')
-            {
-                quit();
-                break;
+                FILE *ganti = fopen("stok.txt", "w");
+                fprintf(ganti, "%s,%d,%d\n", list[i].namaBarang, list[i].stokBarang, list[i].hargaBarang);
+                fclose(ganti);
             }
             else
             {
-                printf("\nInput Invalid! Mohon memasukkan angka 1 sampai 3!\n");
+                FILE *ganti = fopen("stok.txt", "a");
+                fprintf(ganti, "%s,%d,%d\n", list[i].namaBarang, list[i].stokBarang, list[i].hargaBarang);
+                fclose(ganti);
             }
         }
+        i++;
     }
+}
+
+int pembayaran(struct barang list[1000])
+{
+    int i, hasil, hargaTotal;
+    while (1)
+    {
+        hasil = strcmp(list[i].namaBarang, "\0");
+        if (hasil == 0)
+        {
+            break;
+        }
+        else
+        {
+            hargaTotal = hargaTotal + list[i].hargaBarang;
+        }
+    }
+    printf("%d\n", hargaTotal);
+    return hargaTotal;
+}
+
+int PembeliMember(int masuk)
+{
+    FILE *member = fopen("member.txt", "r");
+    char tempNama[100], tempNoKtp[100], tempNoTelp[100], tempID[100];
+    int i = 0, Id;
+    do
+    {
+        int baca = fscanf(member, "%99[^,],%99[^,],%99[^,],%99[^\n]\n", tempID, tempNama, tempNoKtp, tempNoTelp);
+        if (baca == 4)
+        {
+            Id = atoi(tempID);
+            if (Id == masuk)
+            {
+                return 1;
+            }
+        }
+    } while (!feof(member));
+    fclose(member);
     return 0;
 }
+
+void transaksi()
+{
+    int pilihan, jawaban, banyakBarang, i = 0, pengulang, bayar, hargatotal = 0, kembalian, hasil, samaMember, Idmember, diskon;
+    struct barang kasir[1000];
+    struct barang belanja[1000];
+    struct member berbelanja[1000];
+
+    while (1)
+    {
+        system("clear||cls");
+        CekBarang(kasir);
+        inputInt(&pilihan, "\n\nPilih barang yang mau dibeli: ");
+        inputInt(&banyakBarang, "Masukkan banyak barang yang mau di beli: ");
+        printTransaksi(kasir, pilihan, banyakBarang, i);
+        system("clear||cls");
+        do
+        {
+            CekBarang(kasir);
+            printBelanja(belanja);
+            printf("\n\n[1] Tambah barang\n[2]Ubah banyak barang\n[3]Hapus barang \n[4]lanjut ke pembayaran\n[0]EXIT\n");
+            inputInt(&jawaban, "=>");
+            system("clear||cls");
+            if (jawaban == 1)
+            {
+                break;
+            }
+            else if (jawaban == 2)
+            {
+                int barangUbah, banyakBaru;
+                printBelanja(belanja);
+                inputInt(&barangUbah, "Pilih barang yang akan diubah : ");
+                inputInt(&banyakBaru, "Masukkan banyak barang : ");
+                barangUbah -= 1;
+                printTransaksi(kasir, pilihan, banyakBaru, barangUbah);
+            }
+            else if (jawaban == 3)
+            {
+                hapusBelanja();
+            }
+            else if (jawaban == 4)
+            {
+                // printBelanja(belanja);
+                for (i = 0; i < 1000; i++)
+                {
+                    hasil = strcmp(belanja[i].namaBarang, "\0");
+                    if (hasil == 0)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        // printf("%d\n", belanja[i].hargaBarang);
+                        hargatotal = hargatotal + belanja[i].hargaBarang;
+                    }
+                }
+                while (1)
+                {
+                    do
+                    {
+                        printBelanja(belanja);
+                        printf("\n\nMasukkan angka 0 jika tidak ada member\n");
+                        inputInt(&Idmember, "Masukkan ID Member: ");
+                        samaMember = PembeliMember(Idmember);
+                        if (samaMember == 1)
+                        {
+                            diskon = 0.25 * hargatotal;
+                            hargatotal = hargatotal - diskon;
+                            break;
+                        }
+                        else if (Idmember == 0)
+                        {
+                            break;
+                        }
+                        pengulang = 1;
+                        system("clear||cls");
+                    } while (pengulang == 1);
+
+                    system("clear||cls");
+                    printBelanja(belanja);
+                    printf("\n\nHARGA TOTAL\t\t\tRp.%d\n", hargatotal);
+                    inputInt(&bayar, "Banyak uang yang dibayarkan: ");
+                    kembalian = bayar - hargatotal;
+                    // printf("%d\n", kembalian);
+
+                    if (kembalian < 0)
+                    {
+                        system("clear||cls");
+                        printf("Uang kurang\n");
+                    }
+                    else if (kembalian == 0)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        printf("Kembalian Rp.%d", kembalian);
+                        printf("Tekan enter untuk lanjut");
+                        getchar();
+                        break;
+                    }
+                }
+                setelahPembayaran(kasir, belanja);
+                printStruk(belanja);
+                remove("pembelian.txt");
+                menuKasir();
+            }
+            else if (jawaban == 0)
+            {
+                menuKasir();
+            }
+            pengulang = 1;
+        } while (pengulang == 1);
+        i++;
+    }
+}
+
+void inputKTP(char *noKtp)
+{
+    int salah;
+    while (1)
+    {
+        salah = 0;
+        scanf("%[^\n]", noKtp);
+        fflush(stdin);
+        getchar();
+
+        if (strlen(noKtp) > 16 || strlen(noKtp) < 16)
+            salah++;
+        else
+        {
+            for (int i = 0; i < strlen(noKtp); i++)
+            {
+                if (!isdigit(noKtp[i]))
+                {
+                    salah++;
+                }
+            }
+        }
+
+        if (salah > 0)
+        {
+            printf("Masukkan nomor KTP 16 digit dan harus berupa angka\n==>");
+        }
+        else
+        {
+            break;
+        }
+    }
+}
+void inputTelp(char *noTelp)
+{
+    int salah;
+    while (1)
+    {
+        salah = 0;
+        scanf("%[^\n]", noTelp);
+        fflush(stdin);
+        getchar();
+
+        if (strlen(noTelp) > 12 || strlen(noTelp) < 12)
+            salah++;
+        else
+        {
+            for (int i = 0; i < strlen(noTelp); i++)
+            {
+                if (!isdigit(noTelp[i]))
+                {
+                    salah++;
+                }
+            }
+        }
+
+        if (salah > 0)
+        {
+            printf("Masukkan nomor Telp 12 digit dan harus berupa angka\n==>");
+        }
+        else
+        {
+            break;
+        }
+    }
+}
+
+int inputNomor()
+{
+    char tempNomor[100];
+    char tempNama[100];
+    char tempNoKtp[100];
+    char tempNoTelp[100];
+    int nomor;
+
+    FILE *nomorMember = fopen("member.txt", "r");
+
+    if (nomorMember == NULL)
+    {
+        return 1;
+    }
+    else
+    {
+        do
+        {
+            int baca = fscanf(nomorMember, "%99[^,],%99[^,],%99[^,],%99[^\n]\n", tempNomor, tempNama, tempNoKtp, tempNoTelp);
+            if (baca == 4)
+            {
+                nomor = atoi(tempNomor);
+            }
+        } while (!feof(nomorMember));
+        nomor++;
+        return nomor;
+        fclose(nomorMember);
+    }
+}
+
+int cekKtp(char *noKtp)
+{
+    FILE *cekKTP = fopen("member.txt", "r");
+    char tempNomor[100];
+    char tempNama[100];
+    char tempNoKtp[100];
+    char tempNoTelp[100];
+    int hasil;
+
+    do
+    {
+        int baca = fscanf(cekKTP, "%99[^,],%99[^,],%99[^,],%99[^\n]\n", tempNomor, tempNama, tempNoKtp, tempNoTelp);
+        if (baca == 4)
+        {
+            hasil = strcmp(noKtp, tempNoKtp);
+            if (hasil == 0)
+            {
+                return 1;
+            }
+        }
+    } while (!feof(cekKTP));
+    fclose(cekKTP);
+}
+
+int tambahMember()
+{
+    struct member masuk;
+    int hasil;
+
+    printf("\n+--------------------------------+\n");
+    printf("|          TAMBAH MEMBER         |\n");
+    printf("|================================|\n");
+    printf("masukkan nama: ");
+    scanf("%[^\n]", masuk.nama);
+    fflush(stdin);
+    getchar();
+    printf("Masukkan No KTP: ");
+    inputKTP(masuk.noKtp);
+    printf("Masukkan No Telp: ");
+    inputTelp(masuk.noTelp);
+    masuk.IDMember = inputNomor();
+    hasil = cekKtp(masuk.noKtp);
+    if (hasil == 1)
+    {
+        system("clear||cls");
+        printf("Nomor KTP sudah pernah dipakai\n");
+        tambahMember();
+    }
+    else
+    {
+        system("clear||cls");
+        printf("\n+--------------------------------+\n");
+        printf("|            MEMBER              |\n");
+        printf("|================================|\n");
+        printf("Id Member: %d\n", masuk.IDMember);
+        printf("Id Member: %s\n", masuk.nama);
+        printf("Id Member: %s\n", masuk.noKtp);
+        printf("Id Member: %s\n", masuk.noTelp);
+        FILE *tambahMember = fopen("member.txt", "a");
+        fprintf(tambahMember, "%d,%s,%s,%s\n", masuk.IDMember, masuk.nama, masuk.noKtp, masuk.noTelp);
+        fclose(tambahMember);
+    }
+    printf("\n\nTekan enter untuk melanjutkan");
+    getchar();
+}
+
+// fungsi menu kasir
+void menuKasir()
+{
+    system("clear||cls");
+    int pilihan;
+    struct barang list[1000];
+    printf("\n+--------------------------------+\n");
+    printf("|           MENU KASIR           |\n");
+    printf("|================================|\n");
+    printf("|                                |\n");
+    printf("| [1] Cek Stok Barang            |\n");
+    printf("| [2] Melakukan Transaksi        |\n");
+    printf("| [3] Tambah Member              |\n");
+    printf("| [0] Keluar                     |\n");
+    printf("|                                |\n");
+    printf("+--------------------------------+\n");
+    inputInt(&pilihan, "==>");
+    system("clear||cls");
+
+    switch (pilihan)
+    {
+    case 1:
+        CekBarang(list);
+        printf("[0]EXIT\n");
+        inputInt(&pilihan, "==>");
+        if (pilihan == 0)
+        {
+            menuKasir();
+        }
+        break;
+    case 2:
+        // menuju fungsi transaksi
+        transaksi();
+        break;
+    case 3:
+        tambahMember();
+        main();
+    case 0:
+        // menuju fungsi quit
+        exit(1);
+        break;
+    }
+}
 /*
-    KODE APA ???
+    KODE KASIR BERAKHIR
 =======================================================================================||
 */
 
