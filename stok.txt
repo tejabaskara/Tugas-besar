@@ -1,4 +1,5 @@
 rinso,40,2000
 freshtea,26,7000
-esterC,1000,1000
+esterC,999,1000
 tissue,90,9000
+lifeboy,99,3000

@@ -75,6 +75,9 @@ void menuKasir();
 int cekAkun();
 void deleteLine(FILE *src, FILE *temp, const int line);
 void transaksi();
+void cariBanyak(struct barang list[], int banyak);
+void cariNama(struct barang list[100], char *nama);
+
 /*
     TEMPAT UNTUK MENARUH SEMUA FUNGSI DAN PROSEDUR YANG ADA (SELESAI)
 =======================================================================================||
@@ -262,8 +265,10 @@ void registrasi() // untuk melakukan registrasi (UDAH FIX SIH HARUSNYA)
         printf("===================================================\n");
         printf("\tPassword ADMIN yang anda masukkan benar\n");
         printf("===================================================\n\n");
+        printf("Masukkan username sebanyak 4-16 karakter\n");
         printf("Masukkan username: ");
         scanUsername(registrasiPegawai.username);
+        printf("Masukkan password sebanyak 8 karakter\n");
         printf("Masukkan password anda: ");
         getchar();
         scanPassword(registrasiPegawai.password);
@@ -273,8 +278,10 @@ void registrasi() // untuk melakukan registrasi (UDAH FIX SIH HARUSNYA)
         while (cek == 1)
         {
             printf("USERNAME ANDA SUDAH TERDAFTAR\n\n");
+            printf("Masukkan username sebanyak 4-16 karakter\n");
             printf("Masukkan username: ");
             scanUsername(registrasiPegawai.username);
+            printf("Masukkan password sebanyak 8 karakter\n");
             printf("Masukkan password anda: ");
             getchar();
             scanPassword(registrasiPegawai.password);
@@ -297,9 +304,11 @@ void login() // belum mau fix masih dalam proses
     struct pengenal login;
 
     printf("===================================================\n");
+    printf("Masukkan username sebanyak 4-16 karakter\n");
     printf("Masukkan username: ");
     scanUsername(login.username);
     // printf("%s", login.username);
+    printf("Masukkan password sebanyak 8 karakter\n");
     printf("Masukkan password anda: ");
     getchar();
     scanPassword(login.password);
@@ -364,9 +373,11 @@ int LoginMenu()
         break;
     case 0:
         exit(1);
+        break;
+    default:
+        LoginMenu();
+        break;
     }
-
-    printf("Terimakasih sudah mencoba");
     return 0;
 }
 /*
@@ -612,14 +623,84 @@ void hapusStok()
     rename("delete.tmp", "stok.txt"); // mengganti nama file
 }
 
+void cariNama(struct barang list[100], char *nama)
+{
+    int berhenti, i, pilihan;
+    char barang[100];
+
+    printf("+----------------------------------------------+\n");
+    printf("|                   Cek Stok                   |\n");
+    printf("|==============================================|\n");
+    printf("Nama Barang\t||Stok Barang\t||Harga Barang||\n");
+    while (1)
+    {
+        berhenti = strcmp(list[i].namaBarang, "\0");
+        if (berhenti == 0)
+        {
+            break;
+        }
+        else
+        {
+            int hasil = strcmp(list[i].namaBarang, nama);
+            if (hasil == 0)
+            {
+                printf("%d. %s\t||", i + 1, list[i].namaBarang);
+                printf("%d\t\t||", list[i].stokBarang);
+                printf("Rp.%d\n", list[i].hargaBarang);
+            }
+        }
+        i++;
+    }
+    getchar();
+    fflush(stdin);
+    printf("Tekan enter untuk kembali\n");
+    getchar();
+    system("clear||cls");
+    cekStok();
+}
+
+void cariBanyak(struct barang list[1000], int banyak)
+{
+    int berhenti, i, pilihan;
+    char barang[100];
+
+    printf("+----------------------------------------------+\n");
+    printf("|                   Cek Stok                   |\n");
+    printf("|==============================================|\n");
+    printf("Nama Barang\t||Stok Barang\t||Harga Barang||\n");
+    while (1)
+    {
+        berhenti = strcmp(list[i].namaBarang, "\0");
+        if (berhenti == 0)
+        {
+            break;
+        }
+        else
+        {
+            if (banyak >= list[i].stokBarang)
+            {
+                printf("%d. %s\t||", i + 1, list[i].namaBarang);
+                printf("%d\t\t||", list[i].stokBarang);
+                printf("Rp.%d\n", list[i].hargaBarang);
+            }
+        }
+        i++;
+    }
+    printf("Tekan enter untuk kembali\n");
+    getchar();
+    system("clear||cls");
+    cekStok();
+}
+
 int cekStok() // untuk menunjukkan isi database stok
 {
     struct barang cek[1000];
     char namabarang[100];
-    int i = 0, pilihan, banyakBarang, hargaBarang;
+    int i = 0, pilihan, banyakBarang, hargaBarang, banyak;
+    char barang[100];
 
     CekBarang(cek);
-    printf("\n\n[1] Mengubah Stok, [2] Mengubah harga\n [3] Menambah barang, [4] Hapus barang, [0]EXIT\n");
+    printf("\n\n[1] Mengubah Stok, [2] Mengubah harga, [3] Menambah barang\n[4] Hapus barang, [5] Cari stok [0]EXIT\n");
     inputInt(&pilihan, "=>");
     system("clear||cls");
     switch (pilihan)
@@ -646,6 +727,27 @@ int cekStok() // untuk menunjukkan isi database stok
         CekBarang(cek);
         hapusStok();
         menuAdmin();
+        break;
+    case 5:
+        CekBarang(cek);
+        printf("\n\n[1]Banyak barang\n[2]Dengan nama\n");
+        inputInt(&pilihan, "=>");
+        system("clear||cls");
+        CekBarang(cek);
+        switch (pilihan)
+        {
+        case 1:
+            inputInt(&banyak, "Masukkan banyak barang: ");
+            system("clear||cls");
+            cariBanyak(cek, banyak);
+            break;
+        case 2:
+            printf("Masukkan nama barang: ");
+            scanf("%[^\n]", barang);
+            system("clear||cls");
+            cariNama(cek, barang);
+            break;
+        }
         break;
     default:
         cekStok();
@@ -706,7 +808,7 @@ int cekAkun()
         hapusAkun();
         break;
     case 0:
-        exit(1);
+        menuAdmin();
         break;
     default:
         cekAkun();
@@ -810,7 +912,7 @@ int menuUbahMember()
         menuUbahMember();
         break;
     case 0:
-        exit(1);
+        menuAdmin();
         break;
     default:
         printf("Masukkan angka berupa 1 dan 0\n");
